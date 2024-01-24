@@ -15,6 +15,7 @@ import { useQuery } from "react-query";
 import { z } from "zod";
 
 import { fetchPersons, PersonName } from "../api/fetchPersons";
+const phoneRegExp = /^\(\d{2}\) \d{5}-\d{4}$/;
 
 const personSchema = z.object({
   id: z.number(),
@@ -23,32 +24,39 @@ const personSchema = z.object({
 
 const formSchema = z.object({
   pessoa: personSchema,
-  telefone: z
-    .string()
-    .refine((value) => /^\d+$/.test(value) && value.length >= 10, {
-      message: "O telefone deve ter pelo menos 10 dígitos.",
-    }),
+  telefone: z.string().refine((value) => phoneRegExp.test(value), {
+    message: "Informe um telefone válido.",
+  }),
   email: z.string().email().or(z.literal("")),
 });
-
 export type FormValues = z.infer<typeof formSchema>;
 
 interface FormProps {}
 
 const Form: React.FC<FormProps> = () => {
-  // Destructure properties from useForm
   const methods = useForm<FormValues>();
   const { handleSubmit, formState, reset, setValue, clearErrors } = methods;
-
   const { data: persons, isFetching } = useQuery("persons", fetchPersons);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     console.log(data);
-    reset({});
+    reset();
+    setValue("pessoa", null);
   };
 
   const onError: SubmitErrorHandler<FormValues> = (errors) => {
     console.error(errors);
+  };
+
+  const formatTelefone = (value: string) => {
+    const numbersOnly = value.replace(/\D/g, "");
+    if (numbersOnly.length <= 10) {
+      return numbersOnly.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    } else {
+      return numbersOnly
+        .slice(0, 15)
+        .replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
   };
 
   return (
@@ -62,13 +70,13 @@ const Form: React.FC<FormProps> = () => {
           sx={{ width: 450 }}
           loading={isFetching}
           options={persons || []}
+          value={methods.watch("pessoa") || null}
           onChange={(_, value) => {
             if (value) {
               setValue("pessoa", value);
               clearErrors("pessoa");
             }
           }}
-          value={methods.getValues("pessoa")}
           getOptionLabel={(option: PersonName) => option.nome}
           renderInput={(params) => (
             <TextField
@@ -96,10 +104,11 @@ const Form: React.FC<FormProps> = () => {
             required: "Campo obrigatório.",
             validate: {
               validTelefone: (value) => {
-                const isValid = /^\d+$/.test(value) && value.length >= 10;
+                const formattedValue = formatTelefone(value);
+                methods.setValue("telefone", formattedValue);
                 return (
-                  isValid ||
-                  "O telefone deve conter apenas números e ter pelo menos 10 dígitos."
+                  phoneRegExp.test(formattedValue) ||
+                  "Informe um telefone válido."
                 );
               },
             },
