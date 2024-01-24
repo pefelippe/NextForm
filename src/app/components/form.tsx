@@ -41,7 +41,10 @@ const Form: React.FC<FormProps> = () => {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     console.log(data);
     reset();
-    setValue("pessoa", null);
+    setValue("pessoa", {
+      id: 0,
+      nome: "",
+    });
   };
 
   const onError: SubmitErrorHandler<FormValues> = (errors) => {
