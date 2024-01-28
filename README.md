@@ -13,10 +13,9 @@ medida que a pessoa vai digitando o nome, ele vai buscando e retornando.
 - E-mail
 - Botão enviar
 
-
 ## Como Executar
 
-Utilizei o pnpm para criar o projeto. porem yarn/npm devem funcionar normalmente.
+OBS: Utilizei a ferramenta pnpm para criar e executar o projeto. Porém yarn/npm devem funcionar normalmente.
 
 ```
   pnpm

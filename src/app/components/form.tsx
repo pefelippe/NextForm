@@ -39,6 +39,7 @@ const Form: React.FC<FormProps> = () => {
   const { data: persons, isFetching } = useQuery("persons", fetchPersons);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    window.alert(JSON.stringify(data));
     console.log(data);
     reset();
     setValue("pessoa", {

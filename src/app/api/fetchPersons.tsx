@@ -1,3 +1,5 @@
+import { api } from "./axios";
+
 export interface PersonName {
   id: number;
   nome: string;
@@ -19,12 +21,12 @@ const personsMock: PersonName[] = [
 ];
 
 export const fetchPersons = async (): Promise<PersonName[]> => {
-  const persons = await fetch("http://localhost:3001/persons").then((res) =>
-    res.json(),
-  );
-
-  // se o json-server estiver off
-  if (!persons) return personsMock;
-
-  return persons;
+  try {
+    const persons = await api.get("/persons");
+    const data = persons?.data;
+    return data;
+  } catch (error) {
+    console.error("Error fetching persons:", error);
+    return personsMock; // Return the mock response on axios error
+  }
 };
