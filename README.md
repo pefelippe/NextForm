@@ -21,3 +21,5 @@ OBS: Utilizei a ferramenta pnpm para criar e executar o projeto. Porém yarn/npm
   pnpm
   pnpm dev
 ```
+
+Caso não deseje utilizar o json-server para server o persons.json, retorno uma array com alguns usuários. 
